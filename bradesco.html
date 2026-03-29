@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geração de Token Bradesco</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background: white; max-width: 380px; width: 100%; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); overflow: hidden; border: 1px solid #e0e0e0; }
+        .header { background-color: #cc092f; color: white; padding: 20px; text-align: center; }
+        .logo { max-width: 140px; margin-bottom: 10px; }
+        .content { padding: 30px; text-align: center; }
+        .token-box { background-color: #f8f9fa; border: 2px dashed #cc092f; border-radius: 8px; padding: 20px; margin: 20px 0; font-size: 32px; font-weight: bold; color: #333; letter-spacing: 5px; }
+        .p-status { color: #32bcad; font-weight: bold; font-size: 14px; margin-bottom: 5px; }
+        .p-instrucao { font-size: 13px; color: #666; line-height: 1.5; margin-bottom: 25px; }
+        .footer-logo { font-size: 11px; color: #aaa; text-align: center; margin-top: 20px; padding: 10px; border-top: 1px solid #eee; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="header">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e0/Logo_Bradesco.svg" alt="Bradesco" class="logo">
+        <div style="font-size: 18px; font-weight: bold;">Validação de Recebimento</div>
+    </div>
+    <div class="content">
+        <div class="p-status">Autenticação Biométrica Confirmada!</div>
+        <p class="p-instrucao">A biometria facial e geográfica foi validada com sucesso pelo sistema de segurança do Banco Central.</p>
+        
+        <label style="font-size: 12px; color: #888;">TOKEN DE AUTENTICAÇÃO GERADO:</label>
+        
+        <div class="token-box" id="token">----</div>
+        
+        <p class="p-instrucao"><b>Importante:</b> Informe este token de 4 dígitos ao pagador para a liberação imediata do valor de recebimento via PIX.</p>
+    </div>
+    <div class="footer-logo">Bradesco S.A. - 2024</div>
+</div>
+
+<script>
+    // Função que gera um número aleatório de 4 dígitos (entre 1000 e 9999)
+    function gerarTokenAleatorio() {
+        const min = 1000;
+        const max = 9999;
+        const token = Math.floor(Math.random() * (max - min + 1)) + min;
+        document.getElementById('token').innerText = token;
+    }
+
+    // Gera o token assim que a página é aberta
+    window.onload = gerarTokenAleatorio;
+</script>
+
+</body>
+</html>
+
